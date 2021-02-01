@@ -15,6 +15,7 @@ var config = {
   mePath: "/auth/me",
   userVar: "user",
   tokenVar: "token",
+  errorVar: "error",
   cookieDuration: 60 * 60 * 24 * 30
 };
 
@@ -31,6 +32,37 @@ function _await(value, then, direct) {
 }
 
 var cookie = new Cookie__default['default']();
+
+function _catch(body, recover) {
+  try {
+    var result = body();
+  } catch (e) {
+    return recover(e);
+  }
+
+  if (result && result.then) {
+    return result.then(void 0, recover);
+  }
+
+  return result;
+}
+
+var createError = function createError(err) {
+  if (err.response) {
+    return {
+      error: true,
+      response: true,
+      message: err.response.data[config.errorVar]
+    };
+  } else {
+    return {
+      error: true,
+      response: false,
+      message: "Service Unavailable"
+    };
+  }
+};
+
 var auth = {
   setHeader: function setHeader(token) {
     if (!token) {
@@ -43,26 +75,26 @@ var auth = {
     try {
       var _this2 = this;
 
-      var token = null;
+      return _catch(function () {
+        var token = null;
 
-      if (cookie.get("auth.token")) {
-        token = cookie.get("auth.token");
-      } else if (process.browser) {
-        token = localStorage.getItem("auth.token");
-      }
+        if (cookie.get("auth.token")) {
+          token = cookie.get("auth.token");
+        } else if (process.browser) {
+          token = localStorage.getItem("auth.token");
+        }
 
-      _this2.setHeader(token);
+        _this2.setHeader(token);
 
-      if (!token) {
-        return _this2.logout();
-      }
-
-      return _await(axios__default['default'].get(config.apiURL + config.mePath), function (response) {
-        var user = response.data[config.userVar];
-        return {
-          token: token,
-          user: user
-        };
+        return token ? _await(axios__default['default'].get(config.apiURL + config.mePath), function (response) {
+          var user = response.data[config.userVar];
+          return {
+            token: token,
+            user: user
+          };
+        }) : _this2.logout();
+      }, function (err) {
+        return createError(err);
       });
     } catch (e) {
       return Promise.reject(e);
@@ -72,26 +104,30 @@ var auth = {
     try {
       var _this4 = this;
 
-      return _await(axios__default['default'].post(config.apiURL + config.loginPath, credentials), function (response) {
-        var token = response.data[config.tokenVar];
+      return _catch(function () {
+        return _await(axios__default['default'].post(config.apiURL + config.loginPath, credentials), function (response) {
+          var token = response.data[config.tokenVar];
 
-        if (process.browser) {
-          localStorage.setItem("auth.token", token);
-        }
+          if (process.browser) {
+            localStorage.setItem("auth.token", token);
+          }
 
-        if (rememberMe) {
-          cookie.set("auth.token", token, {
-            maxAge: config.cookieDuration
+          if (rememberMe) {
+            cookie.set("auth.token", token, {
+              maxAge: config.cookieDuration
+            });
+          }
+
+          return _await(_this4.autoLogin(), function (autoLoginResponse) {
+            var user = autoLoginResponse.user;
+            return {
+              token: token,
+              user: user
+            };
           });
-        }
-
-        return _await(_this4.autoLogin(), function (autoLoginResponse) {
-          var user = autoLoginResponse.user;
-          return {
-            token: token,
-            user: user
-          };
         });
+      }, function (err) {
+        return createError(err);
       });
     } catch (e) {
       return Promise.reject(e);
@@ -108,10 +144,20 @@ var auth = {
       token: null
     };
   },
-  register: function register() {
+  register: function register(credentials) {
+    var profile = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+
     try {
-      console.log("Not Implemented Yet");
-      return _await();
+      return _catch(function () {
+        return _await(axios__default['default'].post(config.apiURL + config.registerPath, credentials, profile), function (response) {
+          var user = response.data[config.userVar];
+          return {
+            user: user
+          };
+        });
+      }, function (err) {
+        return createError(err);
+      });
     } catch (e) {
       return Promise.reject(e);
     }

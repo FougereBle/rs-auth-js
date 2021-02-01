@@ -6,17 +6,17 @@ const cookie = new Cookie();
 
 const createError = (err) => {
   if (err.response) {
-    return new Error({
+    return {
       error: true,
       response: true,
       message: err.response.data[config.errorVar],
-    });
+    };
   } else {
-    return new Error({
+    return {
       error: true,
       response: false,
       message: "Service Unavailable",
-    });
+    };
   }
 };
 
