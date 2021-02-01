@@ -96,12 +96,11 @@ export default {
       token: null,
     };
   },
-  async register(credentials, profile = null) {
+  async register(credentials) {
     try {
       const response = await axios.post(
         config.apiURL + config.registerPath,
-        credentials,
-        profile
+        credentials
       );
 
       const user = response.data[config.userVar];

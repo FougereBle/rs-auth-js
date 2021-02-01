@@ -145,11 +145,9 @@ var auth = {
     };
   },
   register: function register(credentials) {
-    var profile = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
-
     try {
       return _catch(function () {
-        return _await(axios__default['default'].post(config.apiURL + config.registerPath, credentials, profile), function (response) {
+        return _await(axios__default['default'].post(config.apiURL + config.registerPath, credentials), function (response) {
           var user = response.data[config.userVar];
           return {
             user: user
