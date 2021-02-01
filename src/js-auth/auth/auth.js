@@ -4,6 +4,22 @@ import Cookie from "universal-cookie";
 
 const cookie = new Cookie();
 
+const createError = (err) => {
+  if (err.response) {
+    return {
+      error: true,
+      response: true,
+      message: err.response.data[config.errorVar],
+    };
+  } else {
+    return {
+      error: true,
+      response: false,
+      message: "Service Unavailable",
+    };
+  }
+};
+
 export default {
   setHeader(token) {
     if (!token) {
@@ -13,52 +29,60 @@ export default {
     }
   },
   async autoLogin() {
-    let token = null;
+    try {
+      let token = null;
 
-    if (cookie.get("auth.token")) {
-      token = cookie.get("auth.token");
-    } else if (process.browser) {
-      token = localStorage.getItem("auth.token");
+      if (cookie.get("auth.token")) {
+        token = cookie.get("auth.token");
+      } else if (process.browser) {
+        token = localStorage.getItem("auth.token");
+      }
+
+      this.setHeader(token);
+
+      if (!token) {
+        return this.logout();
+      }
+
+      const response = await axios.get(config.apiURL + config.mePath);
+      const user = response.data[config.userVar];
+
+      return {
+        token,
+        user,
+      };
+    } catch (err) {
+      return createError(err);
     }
-
-    this.setHeader(token);
-
-    if (!token) {
-      return this.logout();
-    }
-
-    const response = await axios.get(config.apiURL + config.mePath);
-    const user = response.data[config.userVar];
-
-    return {
-      token,
-      user,
-    };
   },
   async login(credentials, rememberMe) {
-    const response = await axios.post(
-      config.apiURL + config.loginPath,
-      credentials
-    );
-    const token = response.data[config.tokenVar];
+    try {
+      const response = await axios.post(
+        config.apiURL + config.loginPath,
+        credentials
+      );
+      const token = response.data[config.tokenVar];
 
-    if (process.browser) {
-      localStorage.setItem("auth.token", token);
+      if (process.browser) {
+        localStorage.setItem("auth.token", token);
+      }
+
+      if (rememberMe) {
+        cookie.set("auth.token", token, {
+          maxAge: config.cookieDuration,
+        });
+      }
+
+      const autoLoginResponse = await this.autoLogin();
+      const user = autoLoginResponse.user;
+
+      return {
+        token,
+        user,
+      };
+    } catch (err) {
+      return createError(err);
     }
-
-    if (rememberMe) {
-      cookie.set("auth.token", token, {
-        maxAge: config.cookieDuration,
-      });
-    }
-
-    const autoLoginResponse = await this.autoLogin();
-    const user = autoLoginResponse.user;
-
-    return {
-      token,
-      user,
-    };
   },
   logout() {
     if (process.browser) {
@@ -72,7 +96,21 @@ export default {
       token: null,
     };
   },
-  async register() {
-    console.log("Not Implemented Yet");
+  async register(credentials, profile = null) {
+    try {
+      const response = await axios.post(
+        config.apiURL + config.registerPath,
+        credentials,
+        profile
+      );
+
+      const user = response.data[config.userVar];
+
+      return {
+        user,
+      };
+    } catch (err) {
+      return createError(err);
+    }
   },
 };

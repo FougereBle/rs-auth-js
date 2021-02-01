@@ -5,5 +5,6 @@ export default {
   mePath: "/auth/me",
   userVar: "user",
   tokenVar: "token",
+  errorVar: "error",
   cookieDuration: 60 * 60 * 24 * 30,
 };
