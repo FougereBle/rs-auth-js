@@ -186,3 +186,11 @@ console.log(response);
 true
 */
 ```
+
+## Exemple d'API Express
+
+https://github.com/FougereBle/rs-can-auth-sample-api
+
+## Exemple de Frontend Vue
+
+https://github.com/FougereBle/rs-auth-sample-app
