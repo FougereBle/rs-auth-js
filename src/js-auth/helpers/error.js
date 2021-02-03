@@ -1,3 +1,5 @@
+import config from "../config";
+
 export default function (err) {
   if (err.response) {
     return {
