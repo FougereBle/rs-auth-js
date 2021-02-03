@@ -8,7 +8,7 @@ function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'defau
 var axios__default = /*#__PURE__*/_interopDefaultLegacy(axios);
 var Cookie__default = /*#__PURE__*/_interopDefaultLegacy(Cookie);
 
-var config$1 = {
+var config = {
   apiURL: null,
   loginPath: "/auth/login",
   registerPath: "/auth/register",
@@ -90,8 +90,8 @@ var auth = {
 
         _this2.setHeader(token);
 
-        return token ? _await(axios__default['default'].get(config$1.apiURL + config$1.mePath), function (response) {
-          var user = response.data[config$1.userVar];
+        return token ? _await(axios__default['default'].get(config.apiURL + config.mePath), function (response) {
+          var user = response.data[config.userVar];
           return {
             token: token,
             user: user
@@ -109,8 +109,8 @@ var auth = {
       var _this4 = this;
 
       return _catch(function () {
-        return _await(axios__default['default'].post(config$1.apiURL + config$1.loginPath, credentials), function (response) {
-          var token = response.data[config$1.tokenVar];
+        return _await(axios__default['default'].post(config.apiURL + config.loginPath, credentials), function (response) {
+          var token = response.data[config.tokenVar];
 
           if (process.browser) {
             localStorage.setItem("auth.token", token);
@@ -118,7 +118,7 @@ var auth = {
 
           if (rememberMe) {
             cookie.set("auth.token", token, {
-              maxAge: config$1.cookieDuration
+              maxAge: config.cookieDuration
             });
           }
 
@@ -151,8 +151,8 @@ var auth = {
   register: function register(credentials) {
     try {
       return _catch(function () {
-        return _await(axios__default['default'].post(config$1.apiURL + config$1.registerPath, credentials), function (response) {
-          var user = response.data[config$1.userVar];
+        return _await(axios__default['default'].post(config.apiURL + config.registerPath, credentials), function (response) {
+          var user = response.data[config.userVar];
           return {
             user: user
           };
@@ -196,7 +196,7 @@ var security = {
   recoverPassword: function recoverPassword(login) {
     try {
       return _catch$1(function () {
-        return _await$1(axios__default['default'].post(config$1.apiURL + config$1.recoverPasswordPath, {
+        return _await$1(axios__default['default'].post(config.apiURL + config.recoverPasswordPath, {
           login: login
         }), function () {
           return true;
@@ -211,7 +211,7 @@ var security = {
   resetPassword: function resetPassword(code, credentials) {
     try {
       return _catch$1(function () {
-        return _await$1(axios__default['default'].post(config$1.apiURL + config$1.resetPasswordPath, {
+        return _await$1(axios__default['default'].post(config.apiURL + config.resetPasswordPath, {
           code: code,
           credentials: credentials
         }), function () {
@@ -227,7 +227,7 @@ var security = {
 };
 
 var sdk = {
-  Config: config$1,
+  Config: config,
   Auth: auth,
   Security: security,
   initialize: function initialize(config) {
