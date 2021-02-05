@@ -142,7 +142,7 @@ var auth = {
       localStorage.removeItem("auth.token");
     }
 
-    cookie.remove("auth.token");
+    cookie.set("auth.token", null);
     return {
       user: null,
       token: null
