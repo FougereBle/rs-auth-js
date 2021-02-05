@@ -17,10 +17,10 @@ export default {
     try {
       let token = null;
 
-      if (cookie.get("auth.token")) {
-        token = cookie.get("auth.token");
+      if (cookie.get("authtoken")) {
+        token = cookie.get("authtoken");
       } else if (process.browser) {
-        token = localStorage.getItem("auth.token");
+        token = localStorage.getItem("authtoken");
       }
 
       this.setHeader(token);
@@ -49,11 +49,11 @@ export default {
       const token = response.data[config.tokenVar];
 
       if (process.browser) {
-        localStorage.setItem("auth.token", token);
+        localStorage.setItem("authtoken", token);
       }
 
       if (rememberMe) {
-        cookie.set("auth.token", token, {
+        cookie.set("authtoken", token, {
           maxAge: config.cookieDuration,
         });
       }
@@ -71,10 +71,10 @@ export default {
   },
   logout() {
     if (process.browser) {
-      localStorage.removeItem("auth.token");
+      localStorage.removeItem("authtoken");
     }
 
-    cookie.set("auth.token", null);
+    cookie.remove("authtoken");
 
     return {
       user: null,

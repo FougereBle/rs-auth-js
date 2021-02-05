@@ -82,10 +82,10 @@ var auth = {
       return _catch(function () {
         var token = null;
 
-        if (cookie.get("auth.token")) {
-          token = cookie.get("auth.token");
+        if (cookie.get("authtoken")) {
+          token = cookie.get("authtoken");
         } else if (process.browser) {
-          token = localStorage.getItem("auth.token");
+          token = localStorage.getItem("authtoken");
         }
 
         _this2.setHeader(token);
@@ -113,11 +113,11 @@ var auth = {
           var token = response.data[config.tokenVar];
 
           if (process.browser) {
-            localStorage.setItem("auth.token", token);
+            localStorage.setItem("authtoken", token);
           }
 
           if (rememberMe) {
-            cookie.set("auth.token", token, {
+            cookie.set("authtoken", token, {
               maxAge: config.cookieDuration
             });
           }
@@ -139,10 +139,10 @@ var auth = {
   },
   logout: function logout() {
     if (process.browser) {
-      localStorage.removeItem("auth.token");
+      localStorage.removeItem("authtoken");
     }
 
-    cookie.set("auth.token", null);
+    cookie.remove("authtoken");
     return {
       user: null,
       token: null
