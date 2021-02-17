@@ -76,6 +76,8 @@ export default {
 
     cookie.remove("authtoken");
 
+    this.setHeader(null);
+
     return {
       user: null,
       token: null,
